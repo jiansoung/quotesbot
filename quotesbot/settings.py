@@ -74,7 +74,7 @@ ITEM_PIPELINES = {
 }
 
 import os
-IMAGES_STORE = './assets/images'
+IMAGES_STORE = './downloads/images'
 if not os.path.exists(IMAGES_STORE):
     os.makedirs(IMAGES_STORE)
 MEDIA_ALLOW_REDIRECTS = True
