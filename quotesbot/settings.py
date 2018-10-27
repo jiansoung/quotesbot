@@ -64,9 +64,21 @@ ROBOTSTXT_OBEY = True
 
 # Configure item pipelines
 # See https://doc.scrapy.org/en/latest/topics/item-pipeline.html
-#ITEM_PIPELINES = {
-#    'quotesbot.pipelines.QuotesbotPipeline': 300,
-#}
+ITEM_PIPELINES = {
+    'scrapy.pipelines.images.ImagesPipeline': 1,
+    # 'quotesbot.pipelines.QuotesbotPipeline': 300,
+    'quotesbot.pipelines.QuotePipeline': 400,
+    'quotesbot.pipelines.DuplicatesPipeline': 500,
+    # 'quotesbot.pipelines.JsonWriterPipeline': 600,
+    # 'quotesbot.pipelines.MongoPipeline': 700,
+}
+
+import os
+IMAGES_STORE = './assets/images'
+if not os.path.exists(IMAGES_STORE):
+    os.makedirs(IMAGES_STORE)
+MEDIA_ALLOW_REDIRECTS = True
+
 
 # Enable and configure the AutoThrottle extension (disabled by default)
 # See https://doc.scrapy.org/en/latest/topics/autothrottle.html

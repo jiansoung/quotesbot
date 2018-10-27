@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import scrapy
+from quotesbot.items import QuoteItem
 
 
 class GoodreadsQuotesSpider(scrapy.Spider):
@@ -10,14 +11,14 @@ class GoodreadsQuotesSpider(scrapy.Spider):
     def parse(self, response):
         for quote in response.css('div.quote'):
             image_src = quote.css('img::attr(src)').extract_first()
-            text = quote.css('div.quoteText::text').extract_first().strip()
-            author_or_title = quote.css('span.authorOrTitle::text').extract_first().strip()
+            text = quote.css('div.quoteText::text').extract_first()
+            author_or_title = quote.css('span.authorOrTitle::text').extract_first()
             tags = quote.css('div.quoteFooter div.greyText a::text').extract()
-            yield dict(
-                image_src=image_src,
+            yield QuoteItem(
                 text=text,
                 author_or_title=author_or_title,
                 tags=tags,
+                image_urls=[image_src] if image_src else [],
             )
 
         # next_page = response.css('a.next_page::attr(href)').extract_first()
