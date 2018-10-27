@@ -320,3 +320,5 @@ $RECYCLE.BIN/
 
 # End of https://www.gitignore.io/api/python,flask,django,code,macos,linux,windows
 .venv*
+
+log/
