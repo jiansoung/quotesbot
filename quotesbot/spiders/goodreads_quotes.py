@@ -3,7 +3,7 @@ import scrapy
 
 
 class GoodreadsQuotesSpider(scrapy.Spider):
-    name = 'popular_quotes'
+    name = 'goodreads_quotes'
     allowed_domains = ['goodreads.com']
     start_urls = ['https://www.goodreads.com/quotes']
 
