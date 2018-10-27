@@ -21,11 +21,10 @@ class GoodreadsQuotesSpider(scrapy.Spider):
                 image_urls=[image_src] if image_src else [],
             )
 
-        # next_page = response.css('a.next_page::attr(href)').extract_first()
-        # if next_page is not None:
-        #      yield response.follow(next_page, callback=self.parse)
+        next_page = response.css('a.next_page::attr(href)').extract_first()
+        if next_page is not None:
+             yield response.follow(next_page, callback=self.parse)
 
         for tag_link in response.css('ul.listTagsTwoColumn li.greyText'):
              tag_page = tag_link.css('a.gr-hyperlink::attr(href)').extract_first()
              yield response.follow(tag_page, callback=self.parse)
-             break
