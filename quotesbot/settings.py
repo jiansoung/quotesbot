@@ -65,8 +65,8 @@ ROBOTSTXT_OBEY = True
 # Configure item pipelines
 # See https://doc.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
-    'scrapy.pipelines.images.ImagesPipeline': 1,
     # 'quotesbot.pipelines.QuotesbotPipeline': 300,
+    'scrapy.pipelines.images.ImagesPipeline': 1,
     'quotesbot.pipelines.QuotePipeline': 400,
     'quotesbot.pipelines.DuplicatesPipeline': 500,
     # 'quotesbot.pipelines.JsonWriterPipeline': 600,
