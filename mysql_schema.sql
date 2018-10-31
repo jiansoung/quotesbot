@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS tags (
 CREATE TABLE IF NOT EXISTS quotes (
     id          INTEGER PRIMARY KEY AUTO_INCREMENT,
     text        VARCHAR(512) NOT NULL,
-    author_id   INTEGER NOT NULL,
+    author_id   INTEGER,
     created_at  DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at  DATETIME ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (author_id) REFERENCES authors(id),
