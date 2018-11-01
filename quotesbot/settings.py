@@ -17,7 +17,7 @@ NEWSPIDER_MODULE = 'quotesbot.spiders'
 # Database Settings
 
 # MySQL
-mysql = dict(
+MYSQL_SETTINGS = dict(
     user='root',
     passwd='',
     db='quotesbot',

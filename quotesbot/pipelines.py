@@ -128,7 +128,7 @@ class MySQLPipeline(object):
 
     @classmethod
     def from_crawler(cls, crawler):
-        mysql_settings = crawler.settings.get('mysql')
+        mysql_settings = crawler.settings.get('MYSQL_SETTINGS')
         return cls(
             user=mysql_settings['user'],
             passwd=mysql_settings['passwd'],
