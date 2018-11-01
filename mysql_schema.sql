@@ -20,12 +20,32 @@ CREATE TABLE IF NOT EXISTS tags (
 CREATE TABLE IF NOT EXISTS quotes (
     id          INTEGER PRIMARY KEY AUTO_INCREMENT,
     text        VARCHAR(512) NOT NULL,
+    text_hash   CHAR(32) NOT NULL,
     author_id   INTEGER,
     created_at  DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at  DATETIME ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (author_id) REFERENCES authors(id),
-    UNIQUE (author_id, text)
+    UNIQUE (author_id, text_hash)
 ) CHARACTER SET utf8 COLLATE utf8_general_ci;
+
+DELIMITER //
+DROP TRIGGER IF EXISTS before_insert_quotes //
+CREATE TRIGGER before_insert_quotes BEFORE INSERT ON quotes
+FOR EACH ROW
+BEGIN
+    SET NEW.text_hash = MD5(NEW.text);
+END; //
+DELIMITER ;
+
+DELIMITER $$
+DROP TRIGGER IF EXISTS before_update_quotes $$
+CREATE TRIGGER before_update_quotes BEFORE UPDATE ON quotes
+FOR EACH ROW
+BEGIN
+    set NEW.text_hash = MD5(NEW.text);
+END; $$
+DELIMITER ;
+
 
 CREATE TABLE IF NOT EXISTS quote_tag_assoc (
     id          INTEGER PRIMARY KEY AUTO_INCREMENT,
