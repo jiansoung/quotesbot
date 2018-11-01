@@ -23,18 +23,19 @@ def sanitize_item(item):
     item['tags'] = normalize_tags(item['tags'])
 
 def normalize_text(text):
-    _text = text.strip().strip('\u201c\u201d')
+    _text = text.strip().encode('utf-8')
     # TODO
     return _text
 
 def normalize_name(name):
-    _name = name.strip()
+    _name = name.strip().encode('utf-8')
     # TODO: do more to make _name more identical.
     return _name
 
 def normalize_tag(tag):
+    _tag = tag.strip().encode('utf-8')
     # TODO
-    return tag
+    return _tag
 
 def normalize_tags(tags):
     return list(set([normalize_tag(tag) for tag in tags]))
