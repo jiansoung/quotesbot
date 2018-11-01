@@ -18,7 +18,7 @@ from scrapy.exceptions import DropItem
 #         return item
 
 def sanitize_item(item):
-    item['text'] = normalize_name(item['text'])
+    item['text'] = normalize_text(item['text'])
     item['author_or_title'] = normalize_name(item['author_or_title'])
     item['tags'] = normalize_tags(item['tags'])
 
