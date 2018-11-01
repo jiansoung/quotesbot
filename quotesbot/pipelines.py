@@ -58,7 +58,7 @@ class DuplicatesPipeline(object):
         self.items_seen = set()
 
     def process_item(self, item, spider):
-        unique_key = item.author_or_title + item.text
+        unique_key = item.author_or_title + ': ' + item.text
         if unique_key in self.items_seen:
             raise DropItem("Duplicate item found: %s" % item)
         self.items_seen.add(unique_key)
@@ -118,23 +118,24 @@ class MongoPipeline(object):
 
 class MySQLPipeline(object):
 
-    def __init__(self, user, passwd, db, host='localhost', port=3306, **options):
+    def __init__(self, user, passwd, db, host, port, **options):
         self.user = user
         self.passwd = passwd
         self.db = db
         self.host = host
-        self.port = 3306
+        self.port = port
         self.options = options
 
     @classmethod
     def from_crawler(cls, crawler):
+        mysql_settings = crawler.settings.get('mysql')
         return cls(
-            crawler.settings.get('user'),
-            crawler.settings.get('passwd'),
-            crawler.settings.get('db'),
-            crawler.settings.get('host'),
-            crawler.settings.get('port'),
-            **crawler.settings.get('options')
+            user=mysql_settings['user'],
+            passwd=mysql_settings['passwd'],
+            db=mysql_settings['db'],
+            host=mysql_settings.get('host', 'localhost'),
+            port=mysql_settings.get('port', 3306),
+            **mysql_settings.get('options', {})
         )
 
     def open_spider(self, spider):
@@ -163,20 +164,18 @@ class MySQLPipeline(object):
         return self.insert_quote_tag_assoc(quote_id, tag_ids)
 
     def insert_author(self, item):
-        name = item.author_or_title
-        image_path = self.image_path(item)
+        name, image_path = item.author_or_title, self.image_path(item)
         if name == '':
             return None
         sql_statement = 'INSERT INTO authors (name, image_path) VALUES (%s, %s);'
         try:
-            params = (name, image_path)
-            self.cursor.execute(sql_statement, params)
+            self.cursor.execute(sql_statement, (name, image_path))
             author_id = self.cursor.lastrowid
             self.conn.commit()
         except MySQLdb.MySQLError as _:
             self.conn.rollback()
-            author = self.search_author_by_name(name)
-            author_id = author[0] if author else None
+            result = self.search_author_by_name(name)
+            author_id = result[0] if result else None
         return author_id
 
     def search_author_by_name(self, name):
@@ -189,15 +188,14 @@ class MySQLPipeline(object):
         tags = item.tags
         sql_statement = 'INSERT INTO tags (name) VALUES (%s);'
         for tag in tags:
-            params = (tag, )
             try:
-                self.cursor.execute(sql_statement, params)
+                self.cursor.execute(sql_statement, (tag, ))
                 tag_ids.append(self.cursor.lastrowid)
                 self.conn.commit()
             except MySQLdb.MySQLError as _:
                 self.conn.rollback()
-                tag_id = self.search_tag_by_name(tag)
-                if tag_id: tag_ids.append(tag_id)
+                result = self.search_tag_by_name(tag)
+                if result: tag_ids.append(result[0])
         return tag_ids
 
     def search_tag_by_name(self, name):
@@ -206,36 +204,37 @@ class MySQLPipeline(object):
         return self.cursor.fetchone()
 
     def insert_quote(self, item):
-        author_or_title = item.author_or_title
-        author_id = self.insert_author(author_or_title)
-        sql_statement = '''
-        INSERT INTO quotes (text, author_id, image_path)
-        VALUES (%s, %s, %s, %s);
-        '''
-        image_path = self.image_path(item)
+        author_id, text = self.insert_author(item), item.text
+        sql_statement = 'INSERT INTO quotes (author_id, text) VALUES (%s, %s);'
         try:
-            params = (item.text, author_id, image_path)
-            self.cursor.execute(sql_statement, params)
+            self.cursor.execute(sql_statement, (author_id, text))
             lastrowid = self.cursor.lastrowid
             self.conn.commit()
         except MySQLdb.MySQLError as _:
             self.conn.rollback()
-            lastrowid = None
+            result = self.search_quote_by_unique_key(author_id, text)
+            lastrowid = result[0] if result else None
         return lastrowid
+
+    def search_quote_by_unique_key(self, author_id, text):
+        sql_statement = 'SELECT * FROM quotes WHERE author_id=%s AND text=%s LIMIT 1;'
+        self.cursor.execute(sql_statement, (author_id, text))
+        return self.cursor.fetchone()
 
     def insert_quote_tag_assoc(self, quote_id, tag_ids):
         if not (quote_id and tag_ids):
             return False
+        insert_ok = False
         sql_statement = 'INSERT INTO quote_tag_assoc (quote_id, tag_id) VALUES (%s, %s);'
         for tag_id in tag_ids:
             try:
-                params = (quote_id, tag_id)
-                self.cursor.execute(sql_statement, params)
+                self.cursor.execute(sql_statement, (quote_id, tag_id))
                 self.conn.commit()
+                insert_ok = True
             except MySQLdb.MySQLError as _:
-                # almost impossible to come here!
                 self.conn.rollback()
-        return True
+                insert_ok = insert_ok or False
+        return insert_ok
 
     def image_path(self, item):
         return item.images[0]['path'] if item.images else ''

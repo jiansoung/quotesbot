@@ -14,6 +14,20 @@ BOT_NAME = 'quotesbot'
 SPIDER_MODULES = ['quotesbot.spiders']
 NEWSPIDER_MODULE = 'quotesbot.spiders'
 
+# Database Settings
+
+# MySQL
+mysql = dict(
+    user='root',
+    passwd='',
+    db='quotesbot',
+    host='localhost',
+    port=3306,
+    options=dict(),
+)
+
+# MongoDB
+
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 #USER_AGENT = 'quotesbot (+http://www.yourdomain.com)'
