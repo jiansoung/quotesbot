@@ -19,14 +19,3 @@ class QuoteItem(scrapy.Item):
     tags = scrapy.Field()
     image_urls = scrapy.Field()
     images = scrapy.Field()
-
-    def __getitem__(self, key):
-        if key in self.fields:
-            return self[key]
-        raise KeyError("%s does not support field: %s" % (self.__class__.__name__, key))
-
-    def __setitem__(self, key, value):
-        if key in self.fields:
-            self[key] = value
-        else:
-            raise KeyError("%s does not support field: %s" % (self.__class__.__name__, key))

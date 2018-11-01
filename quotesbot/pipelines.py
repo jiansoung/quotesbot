@@ -18,9 +18,9 @@ from scrapy.exceptions import DropItem
 #         return item
 
 def sanitize_item(item):
-    item.text = normalize_name(item.text)
-    item.author_or_title = normalize_name(item.author_or_title)
-    item.tags = normalize_tags(item.tags)
+    item['text'] = normalize_name(item['text'])
+    item['author_or_title'] = normalize_name(item['author_or_title'])
+    item['tags'] = normalize_tags(item['tags'])
 
 def normalize_text(text):
     _text = text.strip().strip('\u201c\u201d')
@@ -46,7 +46,7 @@ class QuotePipeline(object):
     # Dropped items are no longer processed by further pipeline components.
     def process_item(self, item, spider):
         sanitize_item(item)
-        text = item.text
+        text = item['text']
         if text == '':
             raise DropItem("Missing text in %s" % item)
         return item
@@ -58,7 +58,7 @@ class DuplicatesPipeline(object):
         self.items_seen = set()
 
     def process_item(self, item, spider):
-        unique_key = item.author_or_title + ': ' + item.text
+        unique_key = item['author_or_title'] + ': ' + item['text']
         if unique_key in self.items_seen:
             raise DropItem("Duplicate item found: %s" % item)
         self.items_seen.add(unique_key)
@@ -164,7 +164,7 @@ class MySQLPipeline(object):
         return self.insert_quote_tag_assoc(quote_id, tag_ids)
 
     def insert_author(self, item):
-        name, image_path = item.author_or_title, self.image_path(item)
+        name, image_path = item['author_or_title'], self.image_path(item)
         if name == '':
             return None
         sql_statement = 'INSERT INTO authors (name, image_path) VALUES (%s, %s);'
@@ -185,7 +185,7 @@ class MySQLPipeline(object):
 
     def insert_tags(self, item):
         tag_ids = []
-        tags = item.tags
+        tags = item['tags']
         sql_statement = 'INSERT INTO tags (name) VALUES (%s);'
         for tag in tags:
             try:
@@ -204,7 +204,7 @@ class MySQLPipeline(object):
         return self.cursor.fetchone()
 
     def insert_quote(self, item):
-        author_id, text = self.insert_author(item), item.text
+        author_id, text = self.insert_author(item), item['text']
         sql_statement = 'INSERT INTO quotes (author_id, text) VALUES (%s, %s);'
         try:
             self.cursor.execute(sql_statement, (author_id, text))
@@ -237,4 +237,4 @@ class MySQLPipeline(object):
         return insert_ok
 
     def image_path(self, item):
-        return item.images[0]['path'] if item.images else ''
+        return item['images'][0]['path'] if item['images'] else ''
