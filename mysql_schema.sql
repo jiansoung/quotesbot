@@ -3,18 +3,58 @@ USE quotesbot;
 
 CREATE TABLE IF NOT EXISTS authors (
     id          INTEGER PRIMARY KEY AUTO_INCREMENT,
-    name        VARCHAR(255) NOT NULL UNIQUE,
+    name        VARCHAR(255) NOT NULL,
+    name_hash   CHAR(32) NOT NULL,
     image_path  VARCHAR(255) DEFAULT '',
     created_at  DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at  DATETIME ON UPDATE CURRENT_TIMESTAMP
+    updated_at  DATETIME ON UPDATE CURRENT_TIMESTAMP,
+    UNIQUE (name_hash)
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+DELIMITER //
+DROP TRIGGER IF EXISTS before_insert_authors //
+CREATE TRIGGER before_insert_authors BEFORE INSERT ON authors
+FOR EACH ROW
+BEGIN
+    SET NEW.name_hash = MD5(NEW.name);
+END; //
+DELIMITER ;
+
+DELIMITER //
+DROP TRIGGER IF EXISTS before_update_authors //
+CREATE TRIGGER before_update_authors BEFORE UPDATE ON authors
+FOR EACH ROW
+BEGIN
+    SET NEW.name_hash = MD5(NEW.name);
+END; //
+DELIMITER ;
 
 CREATE TABLE IF NOT EXISTS tags (
     id          INTEGER PRIMARY KEY AUTO_INCREMENT,
-    name        VARCHAR(255) NOT NULL UNIQUE,
+    name        VARCHAR(255) NOT NULL,
+    name_hash   CHAR(32) NOT NULL,
     created_at  DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at  DATETIME ON UPDATE CURRENT_TIMESTAMP
+    updated_at  DATETIME ON UPDATE CURRENT_TIMESTAMP,
+    UNIQUE (name_hash)
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+DELIMITER //
+DROP TRIGGER IF EXISTS before_insert_tags //
+CREATE TRIGGER before_insert_tags BEFORE INSERT ON tags
+FOR EACH ROW
+BEGIN
+    SET NEW.name_hash = MD5(NEW.name);
+END; //
+DELIMITER ;
+
+DELIMITER //
+DROP TRIGGER IF EXISTS before_update_tags //
+CREATE TRIGGER before_update_tags BEFORE UPDATE ON tags
+FOR EACH ROW
+BEGIN
+    SET NEW.name_hash = MD5(NEW.name);
+END; //
+DELIMITER ;
 
 CREATE TABLE IF NOT EXISTS quotes (
     id          INTEGER PRIMARY KEY AUTO_INCREMENT,
