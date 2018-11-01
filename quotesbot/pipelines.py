@@ -23,17 +23,17 @@ def sanitize_item(item):
     item['tags'] = normalize_tags(item['tags'])
 
 def normalize_text(text):
-    _text = text.strip().encode('utf-8')
+    _text = text.strip()
     # TODO
     return _text
 
 def normalize_name(name):
-    _name = name.strip().encode('utf-8')
+    _name = name.strip()
     # TODO: do more to make _name more identical.
     return _name
 
 def normalize_tag(tag):
-    _tag = tag.strip().encode('utf-8')
+    _tag = tag.strip()
     # TODO
     return _tag
 
@@ -169,8 +169,9 @@ class MySQLPipeline(object):
         if name == '':
             return None
         sql_statement = 'INSERT INTO authors (name, image_path) VALUES (%s, %s);'
+        params = (name.encode('utf-8'), image_path)
         try:
-            self.cursor.execute(sql_statement, (name, image_path))
+            self.cursor.execute(sql_statement, params)
             author_id = self.cursor.lastrowid
             self.conn.commit()
         except MySQLdb.MySQLError as _:
@@ -190,7 +191,7 @@ class MySQLPipeline(object):
         sql_statement = 'INSERT INTO tags (name) VALUES (%s);'
         for tag in tags:
             try:
-                self.cursor.execute(sql_statement, (tag, ))
+                self.cursor.execute(sql_statement, (tag.encode('utf-8'), ))
                 tag_ids.append(self.cursor.lastrowid)
                 self.conn.commit()
             except MySQLdb.MySQLError as _:
@@ -207,8 +208,9 @@ class MySQLPipeline(object):
     def insert_quote(self, item):
         author_id, text = self.insert_author(item), item['text']
         sql_statement = 'INSERT INTO quotes (author_id, text) VALUES (%s, %s);'
+        params = (author_id, text.encode('utf-8'))
         try:
-            self.cursor.execute(sql_statement, (author_id, text))
+            self.cursor.execute(sql_statement, params)
             lastrowid = self.cursor.lastrowid
             self.conn.commit()
         except MySQLdb.MySQLError as _:
