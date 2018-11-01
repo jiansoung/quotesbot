@@ -182,7 +182,7 @@ class MySQLPipeline(object):
 
     def search_author_by_name(self, name):
         sql_statement = 'SELECT * FROM authors WHERE name = %s LIMIT 1;'
-        self.cursor.execute(sql_statement, (name, ))
+        self.cursor.execute(sql_statement, (name.encode('utf-8'), ))
         return self.cursor.fetchone()
 
     def insert_tags(self, item):
@@ -202,7 +202,7 @@ class MySQLPipeline(object):
 
     def search_tag_by_name(self, name):
         sql_statement = 'SELECT * FROM tags WHERE name = %s LIMIT 1;'
-        self.cursor.execute(sql_statement, (name, ))
+        self.cursor.execute(sql_statement, (name.encode('utf-8'), ))
         return self.cursor.fetchone()
 
     def insert_quote(self, item):
@@ -221,7 +221,7 @@ class MySQLPipeline(object):
 
     def search_quote_by_unique_key(self, author_id, text):
         sql_statement = 'SELECT * FROM quotes WHERE author_id=%s AND text=%s LIMIT 1;'
-        self.cursor.execute(sql_statement, (author_id, text))
+        self.cursor.execute(sql_statement, (author_id, text.encode('utf-8')))
         return self.cursor.fetchone()
 
     def insert_quote_tag_assoc(self, quote_id, tag_ids):
