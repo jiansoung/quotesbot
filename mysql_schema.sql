@@ -1,5 +1,4 @@
-CREATE DATABASE IF NOT EXISTS quotesbot CHARACTER SET utf8 COLLATE utf8_general_ci;
-
+CREATE DATABASE IF NOT EXISTS quotesbot CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE quotesbot;
 
 CREATE TABLE IF NOT EXISTS authors (
@@ -8,14 +7,14 @@ CREATE TABLE IF NOT EXISTS authors (
     image_path  VARCHAR(255) DEFAULT '',
     created_at  DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at  DATETIME ON UPDATE CURRENT_TIMESTAMP
-) CHARACTER SET utf8 COLLATE utf8_general_ci;
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS tags (
     id          INTEGER PRIMARY KEY AUTO_INCREMENT,
     name        VARCHAR(255) NOT NULL UNIQUE,
     created_at  DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at  DATETIME ON UPDATE CURRENT_TIMESTAMP
-) CHARACTER SET utf8 COLLATE utf8_general_ci;
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS quotes (
     id          INTEGER PRIMARY KEY AUTO_INCREMENT,
@@ -26,7 +25,7 @@ CREATE TABLE IF NOT EXISTS quotes (
     updated_at  DATETIME ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (author_id) REFERENCES authors(id),
     UNIQUE (author_id, text_hash)
-) CHARACTER SET utf8 COLLATE utf8_general_ci;
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 DELIMITER //
 DROP TRIGGER IF EXISTS before_insert_quotes //
@@ -56,4 +55,4 @@ CREATE TABLE IF NOT EXISTS quote_tag_assoc (
     FOREIGN KEY (quote_id) REFERENCES quotes(id),
     FOREIGN KEY (tag_id) REFERENCES tags(id),
     UNIQUE (quote_id, tag_id)
-) CHARACTER SET utf8 COLLATE utf8_general_ci;
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
