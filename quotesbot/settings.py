@@ -85,6 +85,7 @@ ITEM_PIPELINES = {
     'quotesbot.pipelines.DuplicatesPipeline': 500,
     # 'quotesbot.pipelines.JsonWriterPipeline': 600,
     # 'quotesbot.pipelines.MongoPipeline': 700,
+    'quotesbot.pipelines.MySQLPipeline': 800,
 }
 
 import os
