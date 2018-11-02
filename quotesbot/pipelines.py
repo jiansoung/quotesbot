@@ -18,7 +18,7 @@ from scrapy.exceptions import DropItem
 #         return item
 
 def sanitize_item(item):
-    item['text'] = normalize_text(item['text'])
+    item['text'] = normalize_texts(item['text'])
     item['author_or_title'] = normalize_name(item['author_or_title'])
     item['tags'] = normalize_tags(item['tags'])
 
@@ -26,6 +26,20 @@ def normalize_text(text):
     _text = text.strip()
     # TODO
     return _text
+
+def normalize_texts(texts):
+    sentences = []
+    for text in texts:
+        sentence = normalize_text(text)
+        if sentence:
+            sentences.append(sentence)
+    while sentences and is_nonsense_ending_string(sentences[-1]):
+        sentences.pop()
+    return '\n'.join(sentences)
+
+def is_nonsense_ending_string(s):
+    nonsense_ending_strings = [ '-', ]
+    return s in nonsense_ending_strings
 
 def normalize_name(name):
     _name = name.strip()

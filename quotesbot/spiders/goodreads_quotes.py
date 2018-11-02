@@ -11,7 +11,7 @@ class GoodreadsQuotesSpider(scrapy.Spider):
     def parse(self, response):
         for quote in response.css('div.quote'):
             image_src = quote.css('img::attr(src)').extract_first()
-            text = quote.css('div.quoteText::text').extract_first()
+            text = quote.css('div.quoteText::text').extract()
             author_or_title = quote.css('span.authorOrTitle::text').extract_first()
             tags = quote.css('div.quoteFooter div.greyText a::text').extract()
             yield QuoteItem(
