@@ -39,8 +39,7 @@ def is_nonsense_ending_string(s):
 
 def normalize_name(name):
     _name = name.strip()
-    # TODO: do more to make _name more identical.
-    return _name
+    return _name if _name else 'unknown'
 
 def normalize_tag(tag):
     _tag = tag.strip()
@@ -114,8 +113,7 @@ class MySQLPipeline(object):
         self.conn.close()
 
     def process_item(self, item, spider):
-        if not self.save_item(item):
-            raise DropItem('item: {} insert failed'.format(item))
+        self.save_item(item)
         return item
 
     def save_item(self, item):
@@ -125,8 +123,6 @@ class MySQLPipeline(object):
 
     def insert_author(self, item):
         name, image_path = item['author_or_title'], self.image_path(item)
-        if name == '':
-            return None
         sql_statement = 'INSERT INTO authors (name, image_path) VALUES (%s, %s);'
         params = (name.encode('utf-8'), image_path)
         try:
@@ -184,19 +180,13 @@ class MySQLPipeline(object):
         return self.cursor.fetchone()
 
     def insert_quote_tag_assoc(self, quote_id, tag_ids):
-        if not (quote_id and tag_ids):
-            return False
-        insert_ok = False
         sql_statement = 'INSERT INTO quote_tag_assoc (quote_id, tag_id) VALUES (%s, %s);'
         for tag_id in tag_ids:
             try:
                 self.cursor.execute(sql_statement, (quote_id, tag_id))
                 self.conn.commit()
-                insert_ok = True
             except MySQLdb.MySQLError as _:
                 self.conn.rollback()
-                insert_ok = insert_ok or False
-        return insert_ok
 
     def image_path(self, item):
         return item['images'][0]['path'] if item['images'] else ''

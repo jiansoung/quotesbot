@@ -13,6 +13,9 @@ class GoodreadsQuotesSpider(scrapy.Spider):
             image_src = quote.css('img::attr(src)').extract_first()
             text = quote.css('div.quoteText::text').extract()
             author_or_title = quote.css('span.authorOrTitle::text').extract_first()
+            _author_or_title = quote.css('a.authorOrTitle::text').extract_first()
+            if _author_or_title:
+                author_or_title = author_or_title.strip() + _author_or_title.strip()
             tags = quote.css('div.quoteFooter div.greyText a::text').extract()
             yield QuoteItem(
                 text=text,
