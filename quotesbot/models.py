@@ -66,6 +66,9 @@ if __name__ == '__main__':
     # engine = create_engine('postgresql+psycopg2://user:password@host:port/dbname[?key=value&key=value...]')
     Model.metadata.create_all(engine)
     session = Session(engine)
+
+    print('Stop')
+
     quotes = [
         Quote(
             text='遗忘的剑被谁封印。',

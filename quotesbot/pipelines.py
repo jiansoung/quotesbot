@@ -11,6 +11,10 @@ import json
 import pymongo
 import MySQLdb
 from scrapy.exceptions import DropItem
+from sqlalchemy import create_engine
+from sqlalchemy.orm import Session
+
+from quotesbot.models import Model, Author, Tag, Quote
 
 
 # class QuotesbotPipeline(object):
@@ -252,6 +256,34 @@ class MySQLPipeline(object):
                 self.conn.rollback()
                 insert_ok = insert_ok or False
         return insert_ok
+
+    def image_path(self, item):
+        return item['images'][0]['path'] if item['images'] else ''
+
+
+class SQLAlchemyPipeline(object):
+
+    def __init__(self, connect_string):
+        self.connect_string = connect_string
+
+    @classmethod
+    def from_crawler(cls, crawler):
+        connect_string = crawler.settings.get('SQLALCHEMY_CONNECT_STRING')
+        return cls(connect_string=connect_string)
+
+    def open_spider(self, spider):
+        engine = create_engine(self.connect_string)
+        Model.metadata.create_all(engine)
+        self.session = Session(engine)
+
+    def close_spider(self, spider):
+        self.session.close()
+
+    def process_item(self, item, spider):
+        # TODO
+        return item
+
+
 
     def image_path(self, item):
         return item['images'][0]['path'] if item['images'] else ''
