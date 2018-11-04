@@ -35,7 +35,7 @@ def normalize_texts(texts):
             sentences.append(sentence)
     while sentences and is_nonsense_ending_string(sentences[-1]):
         sentences.pop()
-    return '\n'.join(sentences)
+    return ''.join(sentences)
 
 def is_nonsense_ending_string(s):
     nonsense_ending_strings = [ '-', '―' ]
