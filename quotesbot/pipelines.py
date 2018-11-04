@@ -38,7 +38,7 @@ def normalize_texts(texts):
     return '\n'.join(sentences)
 
 def is_nonsense_ending_string(s):
-    nonsense_ending_strings = [ '-', ]
+    nonsense_ending_strings = [ '-', '―' ]
     return s in nonsense_ending_strings
 
 def normalize_name(name):
