@@ -83,8 +83,6 @@ ITEM_PIPELINES = {
     'scrapy.pipelines.images.ImagesPipeline': 1,
     'quotesbot.pipelines.QuotePipeline': 400,
     'quotesbot.pipelines.DuplicatesPipeline': 500,
-    # 'quotesbot.pipelines.JsonWriterPipeline': 600,
-    # 'quotesbot.pipelines.MongoPipeline': 700,
     'quotesbot.pipelines.MySQLPipeline': 800,
 }
 
