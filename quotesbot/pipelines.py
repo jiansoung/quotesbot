@@ -5,16 +5,8 @@
 # Don't forget to add your pipeline to the ITEM_PIPELINES setting
 # See: https://doc.scrapy.org/en/latest/topics/item-pipeline.html
 
-import time
-import json
-
-import pymongo
 import MySQLdb
 from scrapy.exceptions import DropItem
-from sqlalchemy import create_engine
-from sqlalchemy.orm import Session
-
-from quotesbot.models import Model, Author, Tag, Quote
 
 
 # class QuotesbotPipeline(object):
@@ -81,57 +73,6 @@ class DuplicatesPipeline(object):
         if unique_key in self.items_seen:
             raise DropItem("Duplicate item found: %s" % item)
         self.items_seen.add(unique_key)
-        return item
-
-
-# The purpose of JsonWriterPipeline is just to introduce how to write item
-# pipelines. If you really want to store all scraped items into a JSON file you
-# should use the Feed exports.
-class JsonWriterPipeline(object):
-
-    # This method is called when the spider is opened.
-    def open_spider(self, spider):
-        self.file = open('items.jl', 'w')
-
-    # This method is called when the spider is closed.
-    def close_spider(self, spider):
-        self.file.close()
-
-    def process_item(self, item, spider):
-        line = json.dumps(dict(item)) + '\n'
-        self.file.write(line)
-        return item
-
-
-class MongoPipeline(object):
-
-    collection_name = 'scrapy_items'
-
-    def __init__(self, mongo_uri, mongo_db):
-        self.mongo_uri = mongo_uri
-        self.mongo_db = mongo_db
-
-    # If present, this classmethod is called to create a pipeline instance from
-    # a Crawler. It must return a new instance of the pipeline. Crawler object
-    # provides access to all Scrapy core components like settings and signals;
-    # it is a way for pipeline to access them and hook its functionality into
-    # Scrapy.
-    @classmethod
-    def from_crawler(cls, crawler):
-        return cls(
-            mongo_uri=crawler.settings.get('MONGO_URI'),
-            mongo_db=crawler.settings.get('MONGO_DATABASE', 'items')
-        )
-
-    def open_spider(self, spider):
-        self.client = pymongo.MongoClient(self.mongo_uri)
-        self.db = self.client[self.mongo_db]
-
-    def close_spider(self, spider):
-        self.client.close()
-
-    def process_item(self, item, spider):
-        self.db[self.collection_name].insert_one(dict(item))
         return item
 
 
@@ -256,34 +197,6 @@ class MySQLPipeline(object):
                 self.conn.rollback()
                 insert_ok = insert_ok or False
         return insert_ok
-
-    def image_path(self, item):
-        return item['images'][0]['path'] if item['images'] else ''
-
-
-class SQLAlchemyPipeline(object):
-
-    def __init__(self, connect_string):
-        self.connect_string = connect_string
-
-    @classmethod
-    def from_crawler(cls, crawler):
-        connect_string = crawler.settings.get('SQLALCHEMY_CONNECT_STRING')
-        return cls(connect_string=connect_string)
-
-    def open_spider(self, spider):
-        engine = create_engine(self.connect_string)
-        Model.metadata.create_all(engine)
-        self.session = Session(engine)
-
-    def close_spider(self, spider):
-        self.session.close()
-
-    def process_item(self, item, spider):
-        # TODO
-        return item
-
-
 
     def image_path(self, item):
         return item['images'][0]['path'] if item['images'] else ''
