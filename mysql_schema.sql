@@ -1,4 +1,4 @@
-CREATE DATABASE IF NOT EXISTS quotesbot CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE DATABASE IF NOT EXISTS quotesbot;
 USE quotesbot;
 
 CREATE TABLE IF NOT EXISTS authors (
@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS authors (
     created_at  DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at  DATETIME ON UPDATE CURRENT_TIMESTAMP,
     UNIQUE (name_hash)
-) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+);
 
 DELIMITER //
 DROP TRIGGER IF EXISTS before_insert_authors //
@@ -36,7 +36,7 @@ CREATE TABLE IF NOT EXISTS tags (
     created_at  DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at  DATETIME ON UPDATE CURRENT_TIMESTAMP,
     UNIQUE (name_hash)
-) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+);
 
 DELIMITER //
 DROP TRIGGER IF EXISTS before_insert_tags //
@@ -65,7 +65,7 @@ CREATE TABLE IF NOT EXISTS quotes (
     updated_at  DATETIME ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (author_id) REFERENCES authors(id),
     UNIQUE (author_id, text_hash)
-) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+);
 
 DELIMITER //
 DROP TRIGGER IF EXISTS before_insert_quotes //
@@ -95,4 +95,4 @@ CREATE TABLE IF NOT EXISTS quote_tag_assoc (
     FOREIGN KEY (quote_id) REFERENCES quotes(id),
     FOREIGN KEY (tag_id) REFERENCES tags(id),
     UNIQUE (quote_id, tag_id)
-) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+);
