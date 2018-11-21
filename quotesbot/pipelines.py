@@ -119,7 +119,7 @@ class MySQLPipeline(object):
     def save_item(self, item):
         tag_ids = self.insert_tags(item)
         quote_id = self.insert_quote(item)
-        return self.insert_quote_tag_assoc(quote_id, tag_ids)
+        self.insert_quote_tag_assoc(quote_id, tag_ids)
 
     def insert_author(self, item):
         name, image_path = item['author_or_title'], self.image_path(item)
