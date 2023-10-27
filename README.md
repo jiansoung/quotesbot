@@ -11,7 +11,7 @@ Let's Play with Scrapy !
 
 ## Create database
 ```shell
-mysql -uroot < mysql_schema.sql
+mysql < mysql_schema.sql
 ```
 
 
@@ -33,4 +33,16 @@ you can also run some spiders with following command:
 ### Spiders
 
 - goodreads_quotes: spider for crawling quotes from goodreads.com.
-- brainyquote: spider for crawling quotes from brainyquote.com
+- brainyquote: spider for crawling quotes from brainyquote.com.
+
+
+## TODO
+
+- Fix brainyquote spider 403 error.
+- Add likes to goodreads_quotes spider and database schema.
+
+ps: 
+```python
+# '169019 likes'
+likes = quote.css('div.quoteFooter div.right a::text').extract_first()
+```
