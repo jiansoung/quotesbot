@@ -6,7 +6,11 @@ from quotesbot.items import QuoteItem
 class GoodreadsQuotesSpider(scrapy.Spider):
     name = 'goodreads_quotes'
     allowed_domains = ['goodreads.com']
-    start_urls = ['https://www.goodreads.com/quotes']
+    start_urls = [
+        'https://www.goodreads.com/quotes',
+        'https://www.goodreads.com/quotes/recently_added',
+        'https://www.goodreads.com/quotes/recently_created',
+    ]
 
     def parse(self, response):
         for quote in response.css('div.quote'):
